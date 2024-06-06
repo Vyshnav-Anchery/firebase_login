@@ -179,11 +179,11 @@ class SignupScreen extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Text("Dont have an account?"),
+                                    const Text("Already have an account?"),
                                     TextButton(
                                         onPressed: () {},
                                         child: const Text(
-                                          "Sign Up",
+                                          "Login",
                                           style: TextStyle(
                                               color: Colors.blue,
                                               decorationColor: Colors.blue,
