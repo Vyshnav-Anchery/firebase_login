@@ -17,7 +17,6 @@ class SignupScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white10,
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
         child: Consumer(
           builder: (context, controller, child) {
             return Container(
