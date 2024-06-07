@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/utils/common widgets/custom_textfield.dart';
+import '../../../core/common widgets/custom_textfield.dart';
 
-class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +12,11 @@ class SignupScreen extends StatelessWidget {
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     TextEditingController emailEditingController = TextEditingController();
     TextEditingController passwordEditingController = TextEditingController();
-    TextEditingController confirmEditingController = TextEditingController();
-    bool isObscure = false;
+    bool isObscure = true;
     return Scaffold(
       backgroundColor: Colors.white10,
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Consumer(
           builder: (context, controller, child) {
             return Container(
@@ -42,14 +42,14 @@ class SignupScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "SignUp",
+                              "Login",
                               style: TextStyle(
                                   fontSize: 50,
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              "Create your Account",
+                              "To Your Account",
                               style: TextStyle(
                                   fontSize: 25, fontWeight: FontWeight.bold),
                             )
@@ -78,19 +78,6 @@ class SignupScreen extends StatelessWidget {
                                       children: [
                                         CustomTextField(
                                           hintText: "Email",
-                                          validator: (value) {
-                                            const String emailPattern =
-                                                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Please enter an email';
-                                            }
-                                            RegExp regex = RegExp(emailPattern);
-                                            if (!regex.hasMatch(value)) {
-                                              return 'Please enter a valid email';
-                                            }
-                                            return null;
-                                          },
                                           textEditingController:
                                               emailEditingController,
                                           isObscure: false,
@@ -99,59 +86,8 @@ class SignupScreen extends StatelessWidget {
                                         const SizedBox(height: 20),
                                         CustomTextField(
                                           hintText: "Password",
-                                          validator: (value) {
-                                            const String passwordPattern =
-                                                r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$';
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Please enter a password';
-                                            }
-                                            if (value.length < 8) {
-                                              return 'Password must be at least 8 characters long';
-                                            }
-                                            RegExp regex =
-                                                RegExp(passwordPattern);
-                                            if (!regex.hasMatch(value)) {
-                                              return 'Password must include an uppercase letter, number, and a special character';
-                                            }
-                                            return null;
-                                          },
                                           textEditingController:
                                               passwordEditingController,
-                                          isPassword: true,
-                                          isObscure: isObscure,
-                                          onpressed: () {},
-                                        ),
-                                        const SizedBox(height: 20),
-                                        CustomTextField(
-                                          hintText: "Confirm Password",
-                                          validator: (value) {
-                                            if (value !=
-                                                passwordEditingController
-                                                    .text) {
-                                              return 'Both passwords must be same';
-                                            }
-                                            return null;
-                                          },
-                                          textEditingController:
-                                              confirmEditingController,
-                                          isPassword: true,
-                                          isObscure: isObscure,
-                                          onpressed: () {},
-                                        ),
-                                        const SizedBox(height: 20),
-                                        CustomTextField(
-                                          hintText: "Confirm Password",
-                                          validator: (value) {
-                                            if (value !=
-                                                passwordEditingController
-                                                    .text) {
-                                              return 'Both passwords must be same';
-                                            }
-                                            return null;
-                                          },
-                                          textEditingController:
-                                              confirmEditingController,
                                           isPassword: true,
                                           isObscure: isObscure,
                                           onpressed: () {},
@@ -166,9 +102,7 @@ class SignupScreen extends StatelessWidget {
                                           backgroundColor:
                                               MaterialStatePropertyAll(
                                                   Colors.orangeAccent)),
-                                      onPressed: () {
-                                        formKey.currentState!.validate();
-                                      },
+                                      onPressed: () {},
                                       child: const Text(
                                         "Log In",
                                         style: TextStyle(color: Colors.black),
@@ -178,11 +112,11 @@ class SignupScreen extends StatelessWidget {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Text("Already have an account?"),
+                                    const Text("Dont have an account?"),
                                     TextButton(
                                         onPressed: () {},
                                         child: const Text(
-                                          "Login",
+                                          "Sign Up",
                                           style: TextStyle(
                                               color: Colors.blue,
                                               decorationColor: Colors.blue,
