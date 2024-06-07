@@ -29,7 +29,10 @@ class SignupController extends ChangeNotifier {
       }).whenComplete(() => Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfileSetupScreen(email: email),
+            builder: (context) => ProfileSetupScreen(
+              email: email,
+              uid: userDetails.uid,
+            ),
           )));
     }
   }

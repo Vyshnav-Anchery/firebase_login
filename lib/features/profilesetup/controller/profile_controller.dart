@@ -1,27 +1,39 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../home/view/home_screen.dart';
 
 class ProfileController extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> updateUserProfile(
-      String email, String profilePictureUrl, GeoPoint location) async {
-    await _firestore.collection('users').doc(email).update({
-      'profilePicture': profilePictureUrl,
-      'location': location,
-    });
-  }
-
+  String profilePictureUrl = "";
   File? image;
   Position? location;
-  late final profilePictureUrl;
+  Future<void> updateUserProfile(
+      String email, String uid, BuildContext context) async {
+    if (image != null && location != null) {
+      await _firestore.collection('users').doc(uid).update({
+        'profilePicture': profilePictureUrl,
+        'location': location,
+      }).whenComplete(() => Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          )));
+    } else {
+      AppConstants.scaffoldMessengerKey.currentState!.showSnackBar(
+        const SnackBar(content: Text('Please complete all fields')),
+      );
+    }
+  }
+
   Future<void> pickImage(String email) async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -38,10 +50,11 @@ class ProfileController extends ChangeNotifier {
       String downloadURL = await ref.getDownloadURL();
 
       profilePictureUrl = downloadURL;
+      notifyListeners();
     }
   }
 
-  Future<Position?> getLocation() async {
+  getLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -87,8 +100,6 @@ class ProfileController extends ChangeNotifier {
 
     location = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-
-    return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    notifyListeners();
   }
 }
