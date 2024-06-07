@@ -12,21 +12,18 @@ class SignupController extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuthService _firebaseAuthService = FirebaseAuthService();
   User? get currentUser => _auth.currentUser;
-
+  ValueNotifier<bool> passObscure = ValueNotifier(true);
+  ValueNotifier<bool> confirmObscure = ValueNotifier(true);
   signUp(
       String email, String pass, String username, BuildContext context) async {
     User? userDetails = await _firebaseAuthService.signUpWithEmail(email, pass);
-    // UserCredential userCredential =
-    //     await _auth.createUserWithEmailAndPassword(
-    //   email: email,
-    //   password: pass,
-    // );
+
     if (userDetails != null) {
       log(userDetails.uid);
       await _firestore.collection('users').doc(userDetails.uid).set({
         'username': username,
         'email': email,
-      }).whenComplete(() => Navigator.push(
+      }).whenComplete(() => Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ProfileSetupScreen(
@@ -43,5 +40,13 @@ class SignupController extends ChangeNotifier {
       'profilePicture': profilePictureUrl,
       'location': location,
     });
+  }
+
+  togglePass() {
+    passObscure.value = !passObscure.value;
+  }
+
+  toggleConfirmPass() {
+    confirmObscure.value = !confirmObscure.value;
   }
 }

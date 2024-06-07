@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,12 +16,14 @@ class ProfileController extends ChangeNotifier {
   String profilePictureUrl = "";
   File? image;
   Position? location;
+
   Future<void> updateUserProfile(
       String email, String uid, BuildContext context) async {
     if (image != null && location != null) {
+      // add profile pic and location to firestore
       await _firestore.collection('users').doc(uid).update({
         'profilePicture': profilePictureUrl,
-        'location': location,
+        'location': GeoPoint(location!.latitude, location!.longitude),
       }).whenComplete(() => Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -34,7 +36,7 @@ class ProfileController extends ChangeNotifier {
     }
   }
 
-  Future<void> pickImage(String email) async {
+  Future<void> pickImage(String uid) async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
@@ -43,7 +45,7 @@ class ProfileController extends ChangeNotifier {
 
       // Upload the image to Firebase Storage
       Reference ref =
-          FirebaseStorage.instance.ref().child('profile_pictures/$email.jpg');
+          FirebaseStorage.instance.ref().child('profile_pictures/$uid.jpg');
       await ref.putFile(image!);
 
       // Get the download URL for the image
@@ -61,15 +63,14 @@ class ProfileController extends ChangeNotifier {
     // Check if location service is enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled. Request user to enable them.
       return await Geolocator.requestPermission().then((value) {
         if (value == LocationPermission.whileInUse ||
             value == LocationPermission.always) {
-          return getLocation(); // Call again if permission is granted
+          return getLocation();
         } else {
           AppConstants.scaffoldMessengerKey.currentState!.showSnackBar(
               const SnackBar(content: Text("Please turn on gps")));
-          return getLocation(); // Handle permission denied or error
+          return getLocation();
         }
       });
     }
@@ -87,17 +88,12 @@ class ProfileController extends ChangeNotifier {
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Explanation for denied forever (optional)
-      print(
-          'Location permissions are permanently denied. Please go to Settings to enable them.');
+      log('Location permissions are permanently denied. Please go to Settings to enable them.');
       AppConstants.scaffoldMessengerKey.currentState!.showSnackBar(const SnackBar(
           content: Text(
               "Location permissions are permanently denied. Please go to Settings to enable them.")));
       return null;
     }
-
-    // Get the current location with desired accuracy
-
     location = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     notifyListeners();

@@ -18,7 +18,6 @@ class _SignupScreenState extends State<SignupScreen> {
   TextEditingController emailEditingController = TextEditingController();
   TextEditingController passwordEditingController = TextEditingController();
   TextEditingController confirmEditingController = TextEditingController();
-  bool isObscure = false;
   late SignupController signupController;
 
   @override
@@ -39,6 +38,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    signupController.confirmObscure.value = true;
+    signupController.passObscure.value = true;
     double cardWidth = MediaQuery.sizeOf(context).height / 2;
     return Scaffold(
       backgroundColor: Colors.white10,
@@ -47,11 +48,11 @@ class _SignupScreenState extends State<SignupScreen> {
           builder: (context, controller, child) {
             return Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   gradient: LinearGradient(begin: Alignment.topCenter, colors: [
-                Color(0xFF76984C),
-                Color.fromARGB(255, 137, 182, 83),
-                Color(0xFF76984C),
+                Theme.of(context).primaryColor,
+                const Color.fromARGB(255, 137, 182, 83),
+                Theme.of(context).primaryColor,
               ])),
               child: Center(
                 child: SizedBox(
@@ -109,7 +110,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                                 value.isEmpty) {
                                               return 'Please enter a username';
                                             }
-
                                             return null;
                                           },
                                           textEditingController:
@@ -139,48 +139,64 @@ class _SignupScreenState extends State<SignupScreen> {
                                           isPassword: false,
                                         ),
                                         const SizedBox(height: 20),
-                                        CustomTextField(
-                                          hintText: "Password",
-                                          validator: (value) {
-                                            const String passwordPattern =
-                                                r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$';
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Please enter a password';
-                                            }
-                                            if (value.length < 8) {
-                                              return 'Password must be at least 8 characters long';
-                                            }
-                                            RegExp regex =
-                                                RegExp(passwordPattern);
-                                            if (!regex.hasMatch(value)) {
-                                              return 'Password must include an uppercase letter, number, and a special character';
-                                            }
-                                            return null;
-                                          },
-                                          textEditingController:
-                                              passwordEditingController,
-                                          isPassword: true,
-                                          isObscure: isObscure,
-                                          onpressed: () {},
-                                        ),
+                                        ListenableBuilder(
+                                            listenable:
+                                                signupController.passObscure,
+                                            builder: (context, child) {
+                                              return CustomTextField(
+                                                hintText: "Password",
+                                                validator: (value) {
+                                                  const String passwordPattern =
+                                                      r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#\$&*~]).{8,}$';
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'Please enter a password';
+                                                  }
+                                                  if (value.length < 8) {
+                                                    return 'Password must be at least 8 characters long';
+                                                  }
+                                                  RegExp regex =
+                                                      RegExp(passwordPattern);
+                                                  if (!regex.hasMatch(value)) {
+                                                    return 'Password must include an uppercase letter, number, and a special character';
+                                                  }
+                                                  return null;
+                                                },
+                                                textEditingController:
+                                                    passwordEditingController,
+                                                isPassword: true,
+                                                isObscure: signupController
+                                                    .passObscure.value,
+                                                onpressed: () =>
+                                                    signupController
+                                                        .togglePass(),
+                                              );
+                                            }),
                                         const SizedBox(height: 20),
-                                        CustomTextField(
-                                          hintText: "Confirm Password",
-                                          validator: (value) {
-                                            if (value !=
-                                                passwordEditingController
-                                                    .text) {
-                                              return 'Both passwords must be same';
-                                            }
-                                            return null;
-                                          },
-                                          textEditingController:
-                                              confirmEditingController,
-                                          isPassword: true,
-                                          isObscure: isObscure,
-                                          onpressed: () {},
-                                        ),
+                                        ListenableBuilder(
+                                            listenable:
+                                                signupController.confirmObscure,
+                                            builder: (context, child) {
+                                              return CustomTextField(
+                                                hintText: "Confirm Password",
+                                                validator: (value) {
+                                                  if (value !=
+                                                      passwordEditingController
+                                                          .text) {
+                                                    return 'Both passwords must be same';
+                                                  }
+                                                  return null;
+                                                },
+                                                textEditingController:
+                                                    confirmEditingController,
+                                                isPassword: true,
+                                                isObscure: signupController
+                                                    .confirmObscure.value,
+                                                onpressed: () =>
+                                                    signupController
+                                                        .toggleConfirmPass(),
+                                              );
+                                            }),
                                         const SizedBox(height: 20),
                                       ],
                                     )),
